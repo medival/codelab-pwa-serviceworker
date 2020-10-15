@@ -6,21 +6,21 @@ const urlsToCache = [
     "/js/main.js"
 ]
 
-self.addEventListener("install", function(event) {
+self.addEventListener("install", event => {
     console.log("ServiceWorker: Menginstall.");
 
     event.waitUntil(
-        caches.open(CACHE_NAME).then(function(cache) {
+        caches.open(CACHE_NAME).then( cache => {
             console.log("ServiceWorker: Membuka cache");
             return cache.addAll(urlsToCache);
         })
     )
 })
 
-self.addEventListener("fetch", function(event){
+self.addEventListener("fetch", event => {
     event.respondWith(
         caches.match(event.request, {cacheName: CACHE_NAME})
-        .then(function(response) {
+        .then( response => {
             if(response) {
                 return response;
             }
@@ -28,14 +28,14 @@ self.addEventListener("fetch", function(event){
             let fetchRequest = event.request.clone();
 
             return fetch(fetchRequest).then(
-                function(response) {
+                response => {
                     if(!response || response.status !== 200) {
                         return response;
                     }
 
                     let responseToCache = response.clone();
                     caches.open(CACHE_NAME)
-                    .then(function(cache) {
+                    .then(cache => {
                         cache.put(event.request, responseToCache)
                     });
 
@@ -46,13 +46,13 @@ self.addEventListener("fetch", function(event){
     )
 })
 
-self.addEventListener('activate', function (event) {
+self.addEventListener('activate', event =>  {
     console.log('Aktivasi service worker baru');
 
     event.waitUntil(
-        caches.keys().then(function(cacheNames) {
+        caches.keys().then( cacheNames => {
             return Promise.all(
-                cacheNames.map(function(cacheName) {
+                cacheNames.map(cacheName => {
                     if (cacheName !== CACHE_NAME && cacheName.startsWith("codepolitan-reader-lite")) {
                         return caches.delete(cacheName);
                     }
